@@ -20,13 +20,13 @@ export default [
       {
         file: 'dist/index.umd.js',
         format: 'umd',
-        name: 'HtmlImageBackgroundColorDetector',
+        name: 'detectImageBackgroundColor',
         sourcemap: true
       },
       {
         file: 'dist/index.umd.min.js',
         format: 'umd',
-        name: 'HtmlImageBackgroundColorDetector',
+        name: 'detectImageBackgroundColor',
         plugins: [terser()],
         sourcemap: true
       }

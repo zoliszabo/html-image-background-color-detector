@@ -13,7 +13,7 @@ npm install @zoliszabo/html-image-background-color-detector
 ### ES Module (Node.js / Bundlers)
 
 ```javascript
-import { detectImageBackgroundColor } from '@zoliszabo/html-image-background-color-detector';
+import detectImageBackgroundColor from '@zoliszabo/html-image-background-color-detector';
 
 const img = document.querySelector('img');
 const color = detectImageBackgroundColor(img);
@@ -29,7 +29,7 @@ console.log(color.r, color.g, color.b); // 135 206 235
 <script src="https://unpkg.com/@zoliszabo/html-image-background-color-detector/dist/index.umd.min.js"></script>
 <script>
   const img = document.querySelector('img');
-  const color = HtmlImageBackgroundColorDetector.detectImageBackgroundColor(img);
+  const color = detectImageBackgroundColor(img);
 
   console.log(color.hex); // "#87ceeb"
   console.log(color.rgb); // "rgb(135, 206, 235)"

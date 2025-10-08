@@ -14,7 +14,7 @@
  * // With custom sample rate (10% instead of 5%)
  * const color2 = detectImageBackgroundColor(img, 0.10);
  */
-export function detectImageBackgroundColor(imgElement, sampleRate = 0.05) {
+export default function detectImageBackgroundColor(imgElement, sampleRate = 0.05) {
     // Create a temporary canvas
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
@@ -111,5 +111,3 @@ function rgbToHex(r, g, b) {
         return hex.length === 1 ? '0' + hex : hex;
     }).join('');
 }
-
-export default detectImageBackgroundColor;
