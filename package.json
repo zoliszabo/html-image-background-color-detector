@@ -1,0 +1,36 @@
+{
+  "name": "@zoliszabo/html-image-background-color-detector",
+  "version": "1.0.2",
+  "description": "A lightweight JavaScript library that detects the dominant background color of an HTML image element by analyzing edge pixels.",
+  "keywords": [
+    "image",
+    "background",
+    "color",
+    "detection",
+    "html",
+    "canvas"
+  ],
+  "homepage": "https://github.com/zoliszabo/html-image-background-color-detector#readme",
+  "bugs": {
+    "url": "https://github.com/zoliszabo/html-image-background-color-detector/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zoliszabo/html-image-background-color-detector.git"
+  },
+  "license": "MIT",
+  "author": "Zoli Szabó",
+  "type": "module",
+  "files": ["dist"],
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "scripts": {
+    "build": "rollup -c",
+    "prepublishOnly": "npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@rollup/plugin-terser": "^0.4.4",
+    "rollup": "^4.52.4"
+  }
+}
