@@ -1,3 +1,6 @@
+# Ignore the package lock file
+package-lock.json
+
 # Dependencies
 node_modules/
 
