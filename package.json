@@ -1,6 +1,6 @@
 {
   "name": "@zoliszabo/html-image-background-color-detector",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "A lightweight JavaScript library that detects the dominant background color of an HTML image element by analyzing edge pixels.",
   "keywords": [
     "image",
