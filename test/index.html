@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Background Color Detector - Visual Tests</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+        }
+        .test-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 382px));
+            gap: 27px;
+            margin-bottom: 30px;
+        }
+        .test-case {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-case:has(.status.pass) {
+            border: 2px solid #0a0;
+        }
+        .test-case:has(.status.fail) {
+            border: 2px solid #d00;
+        }
+        .test-case h3 {
+            font-size: 1em;
+            font-weight: normal;
+            margin-top: 0;
+            color: #555;
+        }
+        .test-case img {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            display: block;
+            line-height: 3em;
+            text-align: center;
+            color: #721c24;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 4px;
+        }
+        .result-item {
+            margin: 5px 0;
+            font-family: monospace;
+            display: flex;
+            align-items: center;
+        }
+        .color-preview {
+            display: inline-block;
+            width: 1.5em;
+            height: 1.5em;
+            border-radius: 4px;
+            vertical-align: middle;
+            margin-left: auto;
+            box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+        }
+        .expected {
+            color: #666;
+        }
+        .status {
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        .status.pass {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.fail {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        #summary {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        #summary h2 {
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Image Background Color Detector - Visual Test Suite</h1>
+
+    <div id="summary">
+        <h2>Test Summary</h2>
+        <div id="summary-content">Running tests...</div>
+    </div>
+
+    <div class="test-container" id="tests">
+        <!-- Test cases will be added here by JavaScript -->
+    </div>
+
+    <script type="module">
+        import detectImageBackgroundColor from '../src/index.js';
+
+        import testCases from './test-cases.js';
+
+        let passedTests = 0;
+        let failedTests = 0;
+
+        function colorMatches(detected, expected) {
+            // Allow some tolerance for color rounding
+            const tolerance = 15;
+            return Math.abs(detected.r - expected.r) <= tolerance &&
+                   Math.abs(detected.g - expected.g) <= tolerance &&
+                   Math.abs(detected.b - expected.b) <= tolerance;
+        }
+
+        function createTestCaseDiv(testCase, bodyHtml) {
+            const testDiv = document.createElement('div');
+            testDiv.className = 'test-case';
+            testDiv.innerHTML = `
+                <h3>${testCase.name}</h3>
+                ${bodyHtml}
+            `;
+            document.getElementById('tests').appendChild(testDiv);
+        }
+
+        function runTest(testCase) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.crossOrigin = "anonymous";
+
+                img.onload = () => {
+                    const detected = detectImageBackgroundColor(img, testCase.sampleRate);
+                    const passed = colorMatches(detected, testCase.expected);
+
+                    if (passed) {
+                        passedTests++;
+                    } else {
+                        failedTests++;
+                    }
+
+                    const bodyHtml = `
+                        <img src="${testCase.src}" alt="Failed to load image">
+                        <div class="result">
+                            <div class="result-item">
+                                <strong>Detected:</strong>
+                                <span>R=${detected.r}, G=${detected.g}, B=${detected.b}</span>
+                                <span class="color-preview" style="background-color: rgb(${detected.r}, ${detected.g}, ${detected.b})"></span>
+                            </div>
+                            <div class="result-item expected">
+                                <strong>Expected:</strong>
+                                <span>R=${testCase.expected.r}, G=${testCase.expected.g}, B=${testCase.expected.b}</span>
+                                <span class="color-preview" style="background-color: rgb(${testCase.expected.r}, ${testCase.expected.g}, ${testCase.expected.b})"></span>
+                            </div>
+                            <span class="status ${passed ? 'pass' : 'fail'}">
+                                ${passed ? '✓ PASS' : '✗ FAIL'}
+                            </span>
+                        </div>
+                    `;
+
+                    createTestCaseDiv(testCase, bodyHtml);
+                    resolve();
+                };
+
+                img.onerror = () => {
+                    failedTests++;
+                    const bodyHtml = `
+                        <div class="result">
+                            <span class="status fail">✗ FAIL - Image failed to load</span>
+                        </div>
+                    `;
+                    createTestCaseDiv(testCase, bodyHtml);
+                    resolve();
+                };
+
+                img.src = testCase.src;
+            });
+        }
+
+        async function runAllTests() {
+            for (const testCase of testCases) {
+                await runTest(testCase);
+            }
+
+            // Update summary
+            const total = passedTests + failedTests;
+            const summaryDiv = document.getElementById('summary-content');
+            summaryDiv.innerHTML = `
+                <p><strong>Total Tests:</strong> ${total}</p>
+                <p style="color: #155724;"><strong>Passed:</strong> ${passedTests}</p>
+                <p style="color: #721c24;"><strong>Failed:</strong> ${failedTests}</p>
+                <p><strong>Success Rate:</strong> ${((passedTests / total) * 100).toFixed(1)}%</p>
+            `;
+        }
+
+        // Run tests when page loads
+        runAllTests();
+    </script>
+</body>
+</html>

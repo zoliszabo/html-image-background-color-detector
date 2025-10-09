@@ -21,16 +21,20 @@
   "license": "MIT",
   "author": "Zoli Szabó",
   "type": "module",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "main": "dist/index.js",
   "module": "dist/index.js",
   "scripts": {
     "build": "rollup -c",
     "prepublishOnly": "npm run build",
-    "test": "echo \"Warning: no test specified\" && exit 0"
+    "test": "echo \"Warning: no test specified\" && exit 0",
+    "browser-test": "npx http-server -c-1 -p 8080 -o test/index.html"
   },
   "devDependencies": {
     "@rollup/plugin-terser": "^0.4.4",
+    "http-server": "^14.1.1",
     "rollup": "^4.52.4"
   }
 }
