@@ -82,9 +82,9 @@ function getMostFrequentColor(pixels) {
 
     pixels.forEach(pixel => {
         // Round colors to reduce variance
-        const r = Math.round(pixel.r / 10) * 10;
-        const g = Math.round(pixel.g / 10) * 10;
-        const b = Math.round(pixel.b / 10) * 10;
+        const r = Math.round(pixel.r / 5) * 5;
+        const g = Math.round(pixel.g / 5) * 5;
+        const b = Math.round(pixel.b / 5) * 5;
         const key = `${r},${g},${b}`;
 
         colorMap[key] = (colorMap[key] || 0) + 1;
