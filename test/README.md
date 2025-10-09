@@ -31,11 +31,14 @@ Edit `test/test-cases.js` and add new test cases to the `testCases` array:
         g: 0-255,  // Green channel value
         b: 0-255   // Blue channel value
     },
-    sampleRate: 0.1  // Optional: override default sample rate (default is 0.05 = 5%)
+    sampleRate: 0.1,      // Optional: override default sample rate (default is 0.05 = 5%)
+    colorRounding: 10     // Optional: override default color rounding (default is 5)
 }
 ```
 
-The `sampleRate` parameter is optional and allows you to test with different sampling rates. Higher values sample more pixels and may be more accurate but slower.
+**Optional Parameters:**
+- `sampleRate`: Higher values sample more pixels (more accurate but slower)
+- `colorRounding`: Higher values group similar colors more aggressively (less precise), lower values preserve more color detail
 
 ## Test Images
 

@@ -8,7 +8,8 @@ export interface ColorResult {
 
 export function detectImageBackgroundColor(
   imgElement: HTMLImageElement,
-  sampleRate?: number
+  sampleRate?: number,
+  colorRounding?: number
 ): ColorResult;
 
 export default detectImageBackgroundColor;

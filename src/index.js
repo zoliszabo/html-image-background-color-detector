@@ -2,6 +2,7 @@
  * Detects the main background color of an image element
  * @param {HTMLImageElement} imgElement - The image element to analyze
  * @param {number} sampleRate - Percentage of width/height to use as sample size (default: 0.05 = 5%)
+ * @param {number} colorRounding - Value to round color channels to reduce variance (default: 5)
  * @returns {Object} Object containing RGB and hex color values
  * @example
  * import { detectImageBackgroundColor } from './imageColorDetector.js';
@@ -13,8 +14,11 @@
  *
  * // With custom sample rate (10% instead of 5%)
  * const color2 = detectImageBackgroundColor(img, 0.10);
+ *
+ * // With custom sample rate and color rounding
+ * const color3 = detectImageBackgroundColor(img, 0.10, 10);
  */
-export default function detectImageBackgroundColor(imgElement, sampleRate = 0.05) {
+export default function detectImageBackgroundColor(imgElement, sampleRate = 0.05, colorRounding = 5) {
     // Create a temporary canvas
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
@@ -56,7 +60,7 @@ export default function detectImageBackgroundColor(imgElement, sampleRate = 0.05
     }
 
     // Find most common color
-    const dominantColor = getMostFrequentColor(edgePixels);
+    const dominantColor = getMostFrequentColor(edgePixels, colorRounding);
 
     // Return color in multiple formats
     return {
@@ -77,14 +81,14 @@ function getPixelColor(data, x, y, width) {
     };
 }
 
-function getMostFrequentColor(pixels) {
+function getMostFrequentColor(pixels, rounding = 5) {
     const colorMap = {};
 
     pixels.forEach(pixel => {
         // Round colors to reduce variance
-        const r = Math.round(pixel.r / 5) * 5;
-        const g = Math.round(pixel.g / 5) * 5;
-        const b = Math.round(pixel.b / 5) * 5;
+        const r = Math.round(pixel.r / rounding) * rounding;
+        const g = Math.round(pixel.g / rounding) * rounding;
+        const b = Math.round(pixel.b / rounding) * rounding;
         const key = `${r},${g},${b}`;
 
         colorMap[key] = (colorMap[key] || 0) + 1;

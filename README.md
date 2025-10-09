@@ -51,6 +51,18 @@ By default, the function samples 5% of the image edges. You can adjust this:
 const color = detectImageBackgroundColor(img, 0.10);
 ```
 
+### With Custom Color Rounding
+
+By default, color values are rounded to the nearest 5 to reduce variance. You can adjust this:
+
+```javascript
+// Use stricter rounding (round to nearest 10)
+const color = detectImageBackgroundColor(img, 0.05, 10);
+
+// Use more precise detection (round to nearest 1 - no rounding)
+const color2 = detectImageBackgroundColor(img, 0.05, 1);
+```
+
 ## How It Works
 
 The library:
@@ -106,11 +118,14 @@ Learn more: [MDN - CORS enabled image](https://developer.mozilla.org/en-US/docs/
 
 ## API
 
-### `detectImageBackgroundColor(imgElement, sampleRate?)`
+### `detectImageBackgroundColor(imgElement, sampleRate?, colorRounding?)`
 
 **Parameters:**
 - `imgElement` (HTMLImageElement): The image element to analyze
 - `sampleRate` (number, optional): Percentage of width/height to sample (default: 0.05 = 5%)
+- `colorRounding` (number, optional): Value to round color channels to reduce variance (default: 5)
+  - Higher values (e.g., 10) = more aggressive grouping, less precision
+  - Lower values (e.g., 1) = more precise detection, may be affected by noise
 
 **Returns:**
 ```typescript

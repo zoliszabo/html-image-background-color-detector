@@ -18,8 +18,8 @@
         }
         .test-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 382px));
-            gap: 27px;
+            grid-template-columns: repeat(auto-fit, minmax(285px, 1fr));
+            gap: 20px;
             margin-bottom: 30px;
         }
         .test-case {
@@ -62,6 +62,9 @@
             font-family: monospace;
             display: flex;
             align-items: center;
+        }
+        .result-item strong {
+            margin-right: 1ch;
         }
         .color-preview {
             display: inline-block;
@@ -123,8 +126,8 @@
         let failedTests = 0;
 
         function colorMatches(detected, expected) {
-            // Allow some tolerance for color rounding
-            const tolerance = 15;
+            // No tolerance for color rounding.
+            const tolerance = 0;
             return Math.abs(detected.r - expected.r) <= tolerance &&
                    Math.abs(detected.g - expected.g) <= tolerance &&
                    Math.abs(detected.b - expected.b) <= tolerance;
@@ -146,7 +149,7 @@
                 img.crossOrigin = "anonymous";
 
                 img.onload = () => {
-                    const detected = detectImageBackgroundColor(img, testCase.sampleRate);
+                    const detected = detectImageBackgroundColor(img, testCase.sampleRate, testCase.colorRounding);
                     const passed = colorMatches(detected, testCase.expected);
 
                     if (passed) {
@@ -160,12 +163,12 @@
                         <div class="result">
                             <div class="result-item">
                                 <strong>Detected:</strong>
-                                <span>R=${detected.r}, G=${detected.g}, B=${detected.b}</span>
+                                <span>${detected.r}, ${detected.g}, ${detected.b}</span>
                                 <span class="color-preview" style="background-color: rgb(${detected.r}, ${detected.g}, ${detected.b})"></span>
                             </div>
                             <div class="result-item expected">
                                 <strong>Expected:</strong>
-                                <span>R=${testCase.expected.r}, G=${testCase.expected.g}, B=${testCase.expected.b}</span>
+                                <span>${testCase.expected.r}, ${testCase.expected.g}, ${testCase.expected.b}</span>
                                 <span class="color-preview" style="background-color: rgb(${testCase.expected.r}, ${testCase.expected.g}, ${testCase.expected.b})"></span>
                             </div>
                             <span class="status ${passed ? 'pass' : 'fail'}">
