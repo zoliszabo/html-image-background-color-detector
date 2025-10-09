@@ -60,6 +60,50 @@ The library:
 4. Finds the most frequently occurring color
 5. Returns the dominant background color in multiple formats
 
+## Important: CORS Restrictions
+
+⚠️ **This library uses canvas to analyze image pixels, which is subject to CORS (Cross-Origin Resource Sharing) restrictions.**
+
+### What this means:
+
+- **Same-origin images**: Images from the same domain as your website work without any configuration
+- **Cross-origin images**: Images from different domains (CDNs, external URLs) will cause a `SecurityError` unless properly configured
+
+### When using cross-origin images:
+
+1. **The server hosting the image must send CORS headers**
+   - The image server must include `Access-Control-Allow-Origin` header
+   - Example: `Access-Control-Allow-Origin: *` or `Access-Control-Allow-Origin: https://yourdomain.com`
+
+2. **Set the `crossOrigin` attribute on your image element**
+
+   In JavaScript:
+   ```javascript
+   const img = document.querySelector('img');
+   img.crossOrigin = 'anonymous'; // Required for CORS images
+   const color = detectImageBackgroundColor(img);
+   ```
+
+   Or in HTML:
+   ```html
+   <img src="https://example.com/image.jpg" crossorigin="anonymous" alt="Description">
+   ```
+
+### Common errors:
+
+If you see errors like:
+- `SecurityError: The operation is insecure`
+- `Tainted canvases may not be exported`
+- `Failed to execute 'getImageData' on 'CanvasRenderingContext2D'`
+
+This means the image is from a different origin and either:
+- The server doesn't send proper CORS headers, OR
+- You haven't set `crossOrigin = 'anonymous'` on the image element
+
+**Solution**: Either use same-origin images, or ensure the image server supports CORS and set the `crossOrigin` attribute.
+
+Learn more: [MDN - CORS enabled image](https://developer.mozilla.org/en-US/docs/Web/HTML/How_to/CORS_enabled_image)
+
 ## API
 
 ### `detectImageBackgroundColor(imgElement, sampleRate?)`
