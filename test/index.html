@@ -74,6 +74,25 @@
             vertical-align: middle;
             margin-left: auto;
             box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+            position: relative;
+            /* Checkerboard pattern for transparent colors */
+            background-image:
+                linear-gradient(45deg, #ccc 25%, transparent 25%),
+                linear-gradient(-45deg, #ccc 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #ccc 75%),
+                linear-gradient(-45deg, transparent 75%, #ccc 75%);
+            background-size: 8px 8px;
+            background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
+        }
+        .color-preview::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 4px;
+            background-color: var(--color);
         }
         .expected {
             color: #666;
@@ -125,12 +144,36 @@
         let passedTests = 0;
         let failedTests = 0;
 
+        function colorText(color) {
+            // Show alpha channel if not fully opaque
+            const showAlpha = color.a !== undefined && color.a < 255;
+            return showAlpha
+                ? `${color.r}, ${color.g}, ${color.b}, ${color.a}`
+                : `${color.r}, ${color.g}, ${color.b}`;
+        }
+
+        function colorStyle(color) {
+            // Use rgba if alpha channel exists and is not fully opaque
+            const showAlpha = color.a !== undefined && color.a < 255;
+            return showAlpha
+                ? `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a / 255})`
+                : `rgb(${color.r}, ${color.g}, ${color.b})`;
+        }
+
         function colorMatches(detected, expected) {
             // No tolerance for color rounding.
             const tolerance = 0;
-            return Math.abs(detected.r - expected.r) <= tolerance &&
+            const rgbMatch = Math.abs(detected.r - expected.r) <= tolerance &&
                    Math.abs(detected.g - expected.g) <= tolerance &&
                    Math.abs(detected.b - expected.b) <= tolerance;
+
+            // Check alpha channel if it's defined in expected value
+            if (expected.a !== undefined) {
+                return rgbMatch && Math.abs(detected.a - expected.a) <= tolerance;
+            }
+
+            // If no alpha in expected, RGB must match AND alpha must be fully opaque (255)
+            return rgbMatch && detected.a === 255;
         }
 
         function createTestCaseDiv(testCase, bodyHtml) {
@@ -163,13 +206,13 @@
                         <div class="result">
                             <div class="result-item">
                                 <strong>Detected:</strong>
-                                <span>${detected.r}, ${detected.g}, ${detected.b}</span>
-                                <span class="color-preview" style="background-color: rgb(${detected.r}, ${detected.g}, ${detected.b})"></span>
+                                <span>${colorText(detected)}</span>
+                                <span class="color-preview" style="--color: ${colorStyle(detected)}"></span>
                             </div>
                             <div class="result-item expected">
                                 <strong>Expected:</strong>
-                                <span>${testCase.expected.r}, ${testCase.expected.g}, ${testCase.expected.b}</span>
-                                <span class="color-preview" style="background-color: rgb(${testCase.expected.r}, ${testCase.expected.g}, ${testCase.expected.b})"></span>
+                                <span>${colorText(testCase.expected)}</span>
+                                <span class="color-preview" style="--color: ${colorStyle(testCase.expected)}"></span>
                             </div>
                             <span class="status ${passed ? 'pass' : 'fail'}">
                                 ${passed ? '✓ PASS' : '✗ FAIL'}

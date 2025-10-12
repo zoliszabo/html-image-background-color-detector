@@ -2,8 +2,9 @@
  * Detects the main background color of an image element
  * @param {HTMLImageElement} imgElement - The image element to analyze
  * @param {number} sampleRate - Percentage of width/height to use as sample size (default: 0.05 = 5%)
- * @param {number} colorRounding - Value to round color channels to reduce variance (default: 5)
- * @returns {Object} Object containing RGB and hex color values
+ * @param {number} colorRounding - Value to round RGB color channels to reduce variance (default: 5)
+ * @param {number} alphaRounding - Value to round alpha channel to reduce variance (default: 5)
+ * @returns {Object} Object containing RGB/RGBA and hex color values
  * @example
  * import { detectImageBackgroundColor } from './imageColorDetector.js';
  *
@@ -11,14 +12,19 @@
  * const color = detectImageBackgroundColor(img);
  * console.log(color.hex); // "#87ceeb"
  * console.log(color.rgb); // "rgb(135, 206, 235)"
+ * console.log(color.rgba); // "rgba(135, 206, 235, 1.00)"
+ * console.log(color.a); // 255 (fully opaque)
  *
  * // With custom sample rate (10% instead of 5%)
  * const color2 = detectImageBackgroundColor(img, 0.10);
  *
  * // With custom sample rate and color rounding
  * const color3 = detectImageBackgroundColor(img, 0.10, 10);
+ *
+ * // With custom alpha rounding (group similar transparency levels)
+ * const color4 = detectImageBackgroundColor(img, 0.05, 5, 50);
  */
-export default function detectImageBackgroundColor(imgElement, sampleRate = 0.05, colorRounding = 5) {
+export default function detectImageBackgroundColor(imgElement, sampleRate = 0.05, colorRounding = 5, alphaRounding = 5) {
     // Create a temporary canvas
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
@@ -60,14 +66,16 @@ export default function detectImageBackgroundColor(imgElement, sampleRate = 0.05
     }
 
     // Find most common color
-    const dominantColor = getMostFrequentColor(edgePixels, colorRounding);
+    const dominantColor = getMostFrequentColor(edgePixels, colorRounding, alphaRounding);
 
     // Return color in multiple formats
     return {
         r: dominantColor.r,
         g: dominantColor.g,
         b: dominantColor.b,
+        a: dominantColor.a,
         rgb: `rgb(${dominantColor.r}, ${dominantColor.g}, ${dominantColor.b})`,
+        rgba: `rgba(${dominantColor.r}, ${dominantColor.g}, ${dominantColor.b}, ${(dominantColor.a / 255).toFixed(2)})`,
         hex: rgbToHex(dominantColor.r, dominantColor.g, dominantColor.b)
     };
 }
@@ -77,19 +85,21 @@ function getPixelColor(data, x, y, width) {
     return {
         r: data[index],
         g: data[index + 1],
-        b: data[index + 2]
+        b: data[index + 2],
+        a: data[index + 3]
     };
 }
 
-function getMostFrequentColor(pixels, rounding = 5) {
+function getMostFrequentColor(pixels, colorRounding = 5, alphaRounding = 5) {
     const colorMap = {};
 
     pixels.forEach(pixel => {
         // Round colors to reduce variance
-        const r = Math.round(pixel.r / rounding) * rounding;
-        const g = Math.round(pixel.g / rounding) * rounding;
-        const b = Math.round(pixel.b / rounding) * rounding;
-        const key = `${r},${g},${b}`;
+        const r = Math.round(pixel.r / colorRounding) * colorRounding;
+        const g = Math.round(pixel.g / colorRounding) * colorRounding;
+        const b = Math.round(pixel.b / colorRounding) * colorRounding;
+        const a = Math.round(pixel.a / alphaRounding) * alphaRounding;
+        const key = `${r},${g},${b},${a}`;
 
         colorMap[key] = (colorMap[key] || 0) + 1;
     });
@@ -101,8 +111,8 @@ function getMostFrequentColor(pixels, rounding = 5) {
     for (const [color, count] of Object.entries(colorMap)) {
         if (count > maxCount) {
             maxCount = count;
-            const [r, g, b] = color.split(',').map(Number);
-            dominantColor = { r, g, b };
+            const [r, g, b, a] = color.split(',').map(Number);
+            dominantColor = { r, g, b, a };
         }
     }
 

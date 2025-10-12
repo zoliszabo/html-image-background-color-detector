@@ -5,7 +5,7 @@
 // {
 //     name: "Test Name",                    // Description of the test
 //     src: "path/to/image.jpg",             // Image path or data URI
-//     expected: { r: 255, g: 128, b: 64 },  // Expected RGB values (0-255)
+//     expected: { r: 255, g: 128, b: 64 },  // Expected RGB values (0-255), plus optional 'a' for alpha
 //     sampleRate: 0.10,                     // Optional: sample rate (default: 0.05 = 5%)
 //     colorRounding: 10                     // Optional: color rounding (default: 5)
 // }
@@ -63,6 +63,12 @@ const testCases = [
         src: "images/006.png",
         expected: { r: 170, g: 170, b: 170 },
         colorRounding: 2
+    },
+    {
+        name: "Test #11 - Transparent",
+        src: "images/007.png",
+        expected: { r: 0, g: 0, b: 0, a: 0 },
+        colorRounding: 1
     },
     // Add more test cases here as needed
 ];
