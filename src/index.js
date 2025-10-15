@@ -66,7 +66,7 @@ export default function detectImageBackgroundColor(imgElement, sampleRate = 0.05
     }
 
     // Find most common color
-    const dominantColor = getMostFrequentColor(edgePixels, colorRounding, alphaRounding);
+    const [dominantColor, frequency] = getMostFrequentColor(edgePixels, colorRounding, alphaRounding);
 
     // Return color in multiple formats
     return {
@@ -76,7 +76,8 @@ export default function detectImageBackgroundColor(imgElement, sampleRate = 0.05
         a: dominantColor.a,
         rgb: `rgb(${dominantColor.r}, ${dominantColor.g}, ${dominantColor.b})`,
         rgba: `rgba(${dominantColor.r}, ${dominantColor.g}, ${dominantColor.b}, ${(dominantColor.a / 255).toFixed(2)})`,
-        hex: rgbToHex(dominantColor.r, dominantColor.g, dominantColor.b)
+        hex: rgbToHex(dominantColor.r, dominantColor.g, dominantColor.b),
+        frequency: Math.round((frequency / edgePixels.length) * 100) / 100,
     };
 }
 
@@ -90,6 +91,13 @@ function getPixelColor(data, x, y, width) {
     };
 }
 
+/**
+ * Finds the most frequent color in an array of pixel colors
+ * @param {Array} pixels - Array of pixel color objects {r, g, b, a}
+ * @param {number} colorRounding - Value to round RGB color channels to reduce variance
+ * @param {number} alphaRounding - Value to round alpha channel to reduce variance
+ * @returns {Array} Array containing the most frequent color object and its count
+ */
 function getMostFrequentColor(pixels, colorRounding = 5, alphaRounding = 5) {
     const colorMap = {};
 
@@ -116,7 +124,7 @@ function getMostFrequentColor(pixels, colorRounding = 5, alphaRounding = 5) {
         }
     }
 
-    return dominantColor;
+    return [dominantColor, maxCount];
 }
 
 function rgbToHex(r, g, b) {

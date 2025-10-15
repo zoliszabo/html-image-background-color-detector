@@ -6,6 +6,7 @@ export interface ColorResult {
   rgb: string;
   rgba: string;
   hex: string;
+  frequency: number;
 }
 
 export function detectImageBackgroundColor(
